@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Vehicle } from '../types';
 import { VEHICLES } from '../data/inventory';
 import { soundEngine } from '../utils/audio';
@@ -124,7 +125,7 @@ export const AcquisitionTerminal: React.FC<AcquisitionTerminalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-[#18181b] mb-8 pb-3">
+        <div className="flex items-center gap-2 border-b border-[#18181b] mb-8 pb-3 relative">
           {[
             { id: 'escrow', label: 'DIRECT ESCROW PURCHASE', icon: ShieldCheck },
             { id: 'finance', label: 'FINANCING & LEASE CALCULATOR', icon: Calculator },
@@ -140,14 +141,23 @@ export const AcquisitionTerminal: React.FC<AcquisitionTerminalProps> = ({
                   soundEngine.playClick(1050);
                   setActiveTab(tab.id as any);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded text-xs font-tech uppercase tracking-wider transition-colors ${
+                className={`relative flex items-center gap-2 px-4 py-2 rounded text-xs font-tech uppercase tracking-wider transition-colors ${
                   isActive 
-                    ? 'bg-[#FF2A00] text-black font-bold shadow-[0_0_15px_rgba(255,42,0,0.25)]' 
+                    ? 'text-black font-bold' 
                     : 'text-[#a1a1aa] hover:text-white hover:bg-[#121214] border border-transparent'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTerminalTab"
+                    transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+                    className="absolute inset-0 bg-[#FF2A00] rounded shadow-[0_0_15px_rgba(255,42,0,0.35)] z-0"
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                </span>
               </button>
             );
           })}

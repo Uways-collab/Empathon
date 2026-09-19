@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { Vehicle } from '../types';
 import { soundEngine } from '../utils/audio';
 import { 
@@ -39,8 +40,17 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({ vehicle,
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div 
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto"
+    >
+      <motion.div 
+        initial={{ scale: 0.93, opacity: 0, y: 25 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.93, opacity: 0, y: 25 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 26 }}
         className="relative w-full max-w-5xl bg-[#09090b] border border-[#27272a] rounded shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -476,7 +486,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({ vehicle,
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

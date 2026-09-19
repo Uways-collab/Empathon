@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { motion } from 'motion/react';
 import { CanvasRenderMode } from '../types';
 import { soundEngine } from '../utils/audio';
 import { 
@@ -615,7 +616,9 @@ export const HeroCanvas: React.FC<HeroCanvasProps> = ({ onAcquireClick, onExplor
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden bg-black select-none cursor-ew-resize"
+        className={`sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden bg-black select-none cursor-ew-resize transition-transform duration-75 ${
+          isRevving ? 'animate-rev-shake' : ''
+        }`}
       >
         {/* 1. THE 300-FRAME CANVAS AS THE TRUE HERO BACKGROUND */}
         <canvas
@@ -717,47 +720,72 @@ export const HeroCanvas: React.FC<HeroCanvasProps> = ({ onAcquireClick, onExplor
         {/* 4. Middle Floating Content & HUD Overlays */}
         <div className="relative z-20 flex-1 w-full flex items-center justify-between px-4 sm:px-8 pointer-events-none">
           {/* Left Floating Typography & CTAs */}
-          <div className="max-w-md space-y-2 pointer-events-auto bg-black/50 p-4 border border-[#18181b]/70 rounded backdrop-blur-md">
+          <motion.div 
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-md space-y-2 pointer-events-auto bg-black/60 p-4 border border-[#18181b]/80 rounded backdrop-blur-md relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+          >
+            {/* Top scanning laser edge */}
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#FF2A00] to-transparent animate-pulse opacity-75" />
+
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#FF2A00]/15 border border-[#FF2A00]/40 text-[#FF2A00] text-[10px] font-tech uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF2A00] animate-ping" />
               <span>ATELIER SPEC 01 // 300-FRAME ROTATION</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-display font-bold uppercase tracking-tight text-white leading-none">
+            <motion.h1 
+              animate={{ 
+                textShadow: isRevving 
+                  ? '0 0 20px rgba(255, 42, 0, 0.9), 0 0 40px rgba(255, 42, 0, 0.6)' 
+                  : '0 0 0px rgba(0,0,0,0)' 
+              }}
+              className="text-3xl sm:text-5xl font-display font-bold uppercase tracking-tight text-white leading-none"
+            >
               PORSCHE <span className="text-[#FF2A00]">GT3 RS</span>
-            </h1>
+            </motion.h1>
 
             <p className="font-tech text-xs text-[#d4d4d8] tracking-wide leading-relaxed">
               STAGE-III CLUBSPORT // 525 BHP // 9,000 RPM. SCROLL VERTICALLY DOWN TO ROTATE 360° OR DRAG HORIZONTALLY TO INSPECT.
             </p>
 
             <div className="pt-2 flex items-center gap-2.5">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: '0 0 25px rgba(255, 42, 0, 0.6)' }}
+                whileTap={{ scale: 0.96 }}
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onAcquireClick();
                 }}
-                className="px-4 py-2 bg-[#FF2A00] hover:bg-[#e02600] text-black font-tech font-bold text-xs uppercase tracking-wider rounded transition-transform active:scale-95 shadow-[0_0_16px_rgba(255,42,0,0.35)]"
+                className="px-4 py-2 bg-[#FF2A00] hover:bg-[#e02600] text-black font-tech font-bold text-xs uppercase tracking-wider rounded transition-transform shadow-[0_0_16px_rgba(255,42,0,0.35)]"
               >
                 ACQUIRE // $389K
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03, borderColor: '#FF2A00' }}
+                whileTap={{ scale: 0.96 }}
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onExploreClick();
                 }}
-                className="px-3.5 py-2 bg-[#121214]/90 hover:bg-[#18181b] text-white border border-[#27272a] hover:border-[#FF2A00] font-tech text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2 bg-[#121214]/90 hover:bg-[#18181b] text-white border border-[#27272a] font-tech text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-1.5"
               >
                 <span>INVENTORY</span>
-                <ArrowDown className="w-3.5 h-3.5 text-[#FF2A00]" />
-              </button>
+                <ArrowDown className="w-3.5 h-3.5 text-[#FF2A00] animate-bounce" />
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Floating Diagnostics HUD */}
-          <div className="hidden sm:block text-right font-tech text-xs space-y-1 bg-black/75 p-3 border border-[#18181b] rounded backdrop-blur-md pointer-events-auto">
+          <motion.div 
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="hidden sm:block text-right font-tech text-xs space-y-1.5 bg-black/80 p-3.5 border border-[#18181b] rounded backdrop-blur-md pointer-events-auto relative shadow-[0_0_25px_rgba(0,0,0,0.8)]"
+          >
             <div className="flex items-center justify-end gap-2 text-[#71717a]">
               <span>FRAME</span>
               <span className="text-white font-bold">[{String(currentFrame + 1).padStart(3, '0')} / {TOTAL_FRAMES}]</span>
@@ -768,7 +796,26 @@ export const HeroCanvas: React.FC<HeroCanvasProps> = ({ onAcquireClick, onExplor
             </div>
             <div className="flex items-center justify-end gap-2 text-[#71717a]">
               <span>ENGINE</span>
-              <span className="text-white font-bold">[{engineRpm} RPM]</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-white font-bold">[{engineRpm} RPM]</span>
+                {/* Audio-reactive RPM Equalizer bars */}
+                <div className="flex items-end gap-0.5 h-3.5">
+                  {[0.4, 0.8, 0.6, 1.0, 0.5, 0.9].map((scale, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{
+                        height: isRevving ? ['4px', '14px', '8px', '14px'] : [`${scale * 6}px`, `${scale * 10}px`, `${scale * 5}px`]
+                      }}
+                      transition={{
+                        duration: isRevving ? 0.12 : 0.4 + i * 0.1,
+                        repeat: Infinity,
+                        repeatType: 'reverse'
+                      }}
+                      className="w-0.5 bg-[#FF2A00] rounded-t"
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="flex items-center justify-end gap-2 text-[#71717a]">
               <span>AXIS</span>
@@ -778,10 +825,11 @@ export const HeroCanvas: React.FC<HeroCanvasProps> = ({ onAcquireClick, onExplor
               <span>SCROLL</span>
               <span className="text-[#FF2A00] font-bold">[{scrollProgressPct}%]</span>
             </div>
-            <div className="text-[10px] text-[#52525b] pt-0.5 border-t border-[#18181b]">
-              CURSOR: X_{hudCoordinates.x} Y_{hudCoordinates.y}
+            <div className="text-[10px] text-[#52525b] pt-1 border-t border-[#18181b] flex items-center justify-end gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
+              <span>CURSOR: X_{hudCoordinates.x} Y_{hudCoordinates.y}</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* 5. Bottom Controls & Vertical Scroll Progress Bar */}
